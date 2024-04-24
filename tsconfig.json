@@ -1,0 +1,16 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "include": ["src/**/*.ts"],
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "strictNullChecks": true,
+    "outDir": "dist"
+  }
+}
