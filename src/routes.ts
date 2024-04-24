@@ -43,8 +43,6 @@ const routes: FastifyPluginAsyncTypebox = async function(
       throw new UnauthorizedError;
     }
 
-    console.log(JSON.stringify(body, null, 2));
-
     for (const { eventName, s3: { bucket, object } } of body.Records) {
       const baseKey = decodeURIComponent(object.key);
       if (bucket.name !== env.bucket.name || !baseKey.startsWith(env.bucket.prefix)) {
