@@ -46,11 +46,12 @@ const routes: FastifyPluginAsyncTypebox = async function(
     console.log(JSON.stringify(body, null, 2));
 
     for (const { eventName, s3: { bucket, object } } of body.Records) {
-      if (bucket.name !== env.bucket.name || !object.key.startsWith(env.bucket.prefix)) {
+      const baseKey = decodeURIComponent(object.key);
+      if (bucket.name !== env.bucket.name || !baseKey.startsWith(env.bucket.prefix)) {
         continue;
       }
 
-      const key = object.key.substring(env.bucket.prefix.length);
+      const key = baseKey.substring(env.bucket.prefix.length);
       if (eventName.startsWith("s3:ObjectCreated:")) {
         addUser(key);
       } else if (eventName.startsWith("s3:ObjectRemoved:")) {
