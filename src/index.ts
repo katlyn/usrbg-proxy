@@ -28,6 +28,6 @@ const sleep = (time: number) => new Promise(res => setTimeout(res, time));
 while (shouldFetch) {
   await updateUsers();
   server.log.info("Updated users");
-  await sleep(15e3);
+  await sleep(1000 * 60 * 15);
 }
 
