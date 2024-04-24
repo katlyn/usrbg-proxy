@@ -25,8 +25,17 @@ const routes: FastifyPluginAsyncTypebox = async function(
   fastify.post("/bucket-events", {
     schema: {
       body: Type.Object({
-        EventType: Type.String(),
-        Key: Type.String()
+        Records: Type.Array(Type.Object({
+          eventName: Type.String(),
+          s3: Type.Object({
+            bucket: Type.Object({
+              name: Type.String()
+            }),
+            object: Type.Object({
+              key: Type.String()
+            })
+          })
+        }))
       })
     }
   }, async ({ body, headers }, reply) => {
@@ -34,17 +43,20 @@ const routes: FastifyPluginAsyncTypebox = async function(
       throw new UnauthorizedError;
     }
 
-    reply.status(204);
-    if (!body.Key.startsWith(env.bucket.prefix)) {
-      return;
+    for (const { eventName, s3: { bucket, object } } of body.Records) {
+      if (bucket.name !== env.bucket.name || !object.key.startsWith(env.bucket.prefix)) {
+        continue;
+      }
+
+      const key = object.key.substring(env.bucket.prefix.length);
+      if (eventName.startsWith("s3:ObjectCreated:")) {
+        addUser(key);
+      } else if (eventName.startsWith("s3:ObjectRemoved:")) {
+        removeUser(key);
+      }
     }
 
-    const key = body.Key.substring(env.bucket.prefix.length);
-    if (body.EventType.startsWith("s3:ObjectCreated:")) {
-      addUser(key);
-    } else if (body.EventType.startsWith("s3:ObjectRemoved:")) {
-      removeUser(key);
-    }
+    reply.status(204);
   });
 };
 
