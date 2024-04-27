@@ -9,14 +9,15 @@ const minio = new Minio.Client({
   secretKey: ""
 });
 
-let cache = new Set<string>;
+let cache = new Map<string, string>;
 
 export function getUsers() {
-  return [...cache];
+  // Trim down etag to the first 4 chars to save a bit of space
+  return [...cache].map(([k, v]) => [k, v.substring(0, 4)]);
 }
 
-export function addUser(uid: string) {
-  cache.add(uid);
+export function addUser(uid: string, etag: string) {
+  cache.set(uid, etag);
 }
 
 export function removeUser(uid: string) {
@@ -25,9 +26,11 @@ export function removeUser(uid: string) {
 
 export async function updateUsers() {
   const objects = await listDirectory();
-  cache = new Set(objects
+  cache = new Map(objects
     .filter(obj => obj.size > 0 && obj.name != undefined)
-    .map(obj => obj.name!.substring(env.bucket.prefix.length))
+    // Minio etags are optional because they had a bug once upon a time, but for
+    // all new files we can safely assume it'll be there
+    .map(obj => [obj.name!.substring(env.bucket.prefix.length), obj.etag!])
   );
 
   return getUsers();

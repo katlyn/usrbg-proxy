@@ -32,7 +32,8 @@ const routes: FastifyPluginAsyncTypebox = async function(
               name: Type.String()
             }),
             object: Type.Object({
-              key: Type.String()
+              key: Type.String(),
+              eTag: Type.String()
             })
           })
         }))
@@ -51,7 +52,7 @@ const routes: FastifyPluginAsyncTypebox = async function(
 
       const key = baseKey.substring(env.bucket.prefix.length);
       if (eventName.startsWith("s3:ObjectCreated:")) {
-        addUser(key);
+        addUser(key, object.eTag);
       } else if (eventName.startsWith("s3:ObjectRemoved:")) {
         removeUser(key);
       }
