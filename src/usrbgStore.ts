@@ -13,7 +13,7 @@ let cache = new Map<string, string>;
 
 export function getUsers() {
   // Trim down etag to the first 4 chars to save a bit of space
-  return [...cache].map(([k, v]) => [k, v.substring(0, 4)]);
+  return Object.fromEntries([...cache].map(([k, v]) => [k, v.substring(0, 4)]));
 }
 
 export function addUser(uid: string, etag: string) {
