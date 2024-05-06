@@ -28,6 +28,7 @@ export const config = {
   },
   bucket: {
     endpoint: "BUCKET_ENDPOINT",
+    publicEndpoint: "BUCKET_PUBLIC_ENDPOINT",
     name: "BUCKET_NAME",
     prefix: "BUCKET_PREFIX"
   },

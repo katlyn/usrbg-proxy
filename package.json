@@ -5,6 +5,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon -r dotenv/config src/index.ts",
+    "debug": "nodemon --inspect -r dotenv/config src/index.ts",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

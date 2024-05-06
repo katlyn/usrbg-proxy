@@ -14,7 +14,7 @@ const routes: FastifyPluginAsyncTypebox = async function(
 
   fastify.get("/users", {}, async (request) => {
       return {
-        endpoint: `https://${env.bucket.endpoint}`,
+        endpoint: `https://${env.bucket.publicEndpoint}`,
         bucket: env.bucket.name,
         prefix: env.bucket.prefix,
         users: getUsers()
