@@ -2,7 +2,7 @@ import {
   FastifyPluginAsyncTypebox, Type
 } from "@fastify/type-provider-typebox";
 import { addUser, getUsers, removeUser } from "./usrbgStore.js";
-import env from "./env.js";
+import env from "./config/env.js";
 import { UnauthorizedError } from "http-errors-enhanced";
 
 const routes: FastifyPluginAsyncTypebox = async function(
@@ -12,12 +12,12 @@ const routes: FastifyPluginAsyncTypebox = async function(
     return { health: "OK" };
   });
 
-  fastify.get("/users", {}, async (request) => {
+  fastify.get("/users", {}, async (_request) => {
       return {
         endpoint: `https://${env.bucket.publicEndpoint}`,
         bucket: env.bucket.name,
         prefix: env.bucket.prefix,
-        users: getUsers()
+        users: await getUsers()
       };
     }
   );
@@ -52,9 +52,9 @@ const routes: FastifyPluginAsyncTypebox = async function(
 
       const key = baseKey.substring(env.bucket.prefix.length);
       if (eventName.startsWith("s3:ObjectCreated:")) {
-        addUser(key, object.eTag);
+        await addUser(key, object.eTag);
       } else if (eventName.startsWith("s3:ObjectRemoved:")) {
-        removeUser(key);
+        await removeUser(key);
       }
     }
 

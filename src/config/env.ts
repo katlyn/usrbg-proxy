@@ -32,7 +32,8 @@ export const config = {
     name: "BUCKET_NAME",
     prefix: "BUCKET_PREFIX"
   },
-  authorization: "EVENT_AUTHORIZATION"
+  authorization: "EVENT_AUTHORIZATION",
+  valkeyUri: "VALKEY_URI"
 };
 
 const env = strictVerify<typeof config>(config, {

@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 ENV PNPM_HOME="/pnpm" PATH="$PNPM_HOME:$PATH"
 ENV API_BASE="" HTTP_HOST="0.0.0.0" HTTP_PORT="80" API_ROOT="./api/"
