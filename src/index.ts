@@ -1,6 +1,7 @@
 import buildServer from "./server.js";
 import env from "./config/env.js";
 import { getUsers, updateUsers } from "./usrbgStore.js";
+import valkey from "./config/valkey.js";
 
 const server = await buildServer({
   logger: { level: "info" },
@@ -26,8 +27,16 @@ process.on("SIGTERM", () => shouldFetch = false);
 let shouldFetch = true;
 const sleep = (time: number) => new Promise(res => setTimeout(res, time));
 while (shouldFetch) {
-  await updateUsers();
-  server.log.info(`Updated users ${Object.keys(await getUsers()).length}`);
-  await sleep(1000 * 60 * 15);
+  // Check if the lock key exists to stop us from hammering the S3 bucket too much
+  const result = await valkey.set("usrbg:users:last-updated", Date.now(), "EX", 60 * 15, "NX");
+  if (result === null) {
+    // The dataset has been updated too recently, don't touch it
+    const ttl = await valkey.ttl("usrbg:users:last-updated");
+    server.log.info(`Not updating users, cache key exists, lock expires in ${ttl} seconds`);
+  } else {
+    const users = await updateUsers();
+    server.log.info(`Updated ${Object.keys(users).length} users`);
+  }
+  // Wait a minute before retying
+  await sleep(1000 * 60);
 }
-
