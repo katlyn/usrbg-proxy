@@ -1,6 +1,6 @@
 import buildServer from "./server.js";
-import env from "./env.js";
-import { updateUsers } from "./usrbgStore.js";
+import env from "./config/env.js";
+import { getUsers, updateUsers } from "./usrbgStore.js";
 
 const server = await buildServer({
   logger: { level: "info" },
@@ -27,7 +27,7 @@ let shouldFetch = true;
 const sleep = (time: number) => new Promise(res => setTimeout(res, time));
 while (shouldFetch) {
   await updateUsers();
-  server.log.info("Updated users");
+  server.log.info(`Updated users ${Object.keys(await getUsers()).length}`);
   await sleep(1000 * 60 * 15);
 }
 
