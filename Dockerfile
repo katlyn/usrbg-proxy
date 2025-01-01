@@ -1,7 +1,7 @@
 FROM node:22-alpine AS base
 
-ENV PNPM_HOME="/pnpm" PATH="$PNPM_HOME:$PATH"
-ENV API_BASE="" HTTP_HOST="0.0.0.0" HTTP_PORT="80" API_ROOT="./api/"
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH" API_BASE="" HTTP_HOST="0.0.0.0" HTTP_PORT="80" API_ROOT="./api/"
 
 RUN corepack enable
 COPY . /usr/src/usrbg-proxy
@@ -18,4 +18,5 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-l
 RUN rm -r src
 
 EXPOSE ${HTTP_PORT}
+HEALTHCHECK CMD node dist/healthcheck.js
 CMD [ "pnpm", "start" ]
