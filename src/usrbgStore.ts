@@ -14,12 +14,10 @@ const minio = new Minio.Client({
 const cache = new Cache(valkey);
 
 export async function getCachedResponse() {
-  console.log("AAAAAAAAAAAAAAAAAAAAAAA");
-  return (await valkey.get("usrbg:users:response")) ?? await storeCachedResponse();
+  return await valkey.get("usrbg:users:response") ?? await storeCachedResponse();
 }
 
 export async function storeCachedResponse() {
-  console.log(":3");
   const response = JSON.stringify({
     endpoint: `https://${env.bucket.publicEndpoint}`,
     bucket: env.bucket.name,
