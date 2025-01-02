@@ -13,6 +13,23 @@ const minio = new Minio.Client({
 
 const cache = new Cache(valkey);
 
+export async function getCachedResponse() {
+  console.log("AAAAAAAAAAAAAAAAAAAAAAA");
+  return (await valkey.get("usrbg:users:response")) ?? await storeCachedResponse();
+}
+
+export async function storeCachedResponse() {
+  console.log(":3");
+  const response = JSON.stringify({
+    endpoint: `https://${env.bucket.publicEndpoint}`,
+    bucket: env.bucket.name,
+    prefix: env.bucket.prefix,
+    users: await getUsers()
+  });
+  await valkey.set("usrbg:users:response", response);
+  return response;
+}
+
 export async function getUsers() {
   // Trim down etag to the first 4 chars to save a bit of space
   return Object.fromEntries(Object.entries(await cache.getAll()).map(([k, v]) => [k, v.substring(0, 4)]));
