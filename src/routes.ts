@@ -1,7 +1,7 @@
 import {
   FastifyPluginAsyncTypebox, Type
 } from "@fastify/type-provider-typebox";
-import { addUser, getUsers, removeUser } from "./usrbgStore.js";
+import { addUser, getCachedResponse, getUsers, removeUser } from "./usrbgStore.js";
 import env from "./config/env.js";
 import { UnauthorizedError } from "http-errors-enhanced";
 
@@ -12,13 +12,9 @@ const routes: FastifyPluginAsyncTypebox = async function(
     return { health: "OK" };
   });
 
-  fastify.get("/users", {}, async (_request) => {
-      return {
-        endpoint: `https://${env.bucket.publicEndpoint}`,
-        bucket: env.bucket.name,
-        prefix: env.bucket.prefix,
-        users: await getUsers()
-      };
+  fastify.get("/users", {}, async (_request, reply) => {
+      reply.header("content-type", "application/json");
+      return getCachedResponse();
     }
   );
 
