@@ -35,10 +35,12 @@ export async function getUsers() {
 
 export async function addUser(uid: string, etag: string) {
   await cache.set(uid, etag);
+  await storeCachedResponse();
 }
 
 export async function removeUser(uid: string) {
   await cache.delete(uid);
+  await storeCachedResponse();
 }
 
 export async function updateUsers() {
@@ -49,6 +51,8 @@ export async function updateUsers() {
     // all new files we can safely assume it'll be there
     .map(obj => [obj.name!.substring(env.bucket.prefix.length), obj.etag!])
   ));
+
+  await storeCachedResponse();
 
   return getUsers();
 }
